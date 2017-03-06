@@ -23,7 +23,7 @@ var DEFAULT_HEADERS = {
 
 function getTranslatorComment(node) {
   var comments = [];
-  (node.leadingComments || []).forEach(function(commentNode) {
+  (node.leadingComments || []).concat(node.innerComments || []).forEach(function(commentNode) {
     var match = commentNode.value.match(/^\s*translators:\s*(.*?)\s*$/im);
     if (match) {
       comments.push(match[1]);
@@ -32,7 +32,7 @@ function getTranslatorComment(node) {
   return comments.length > 0 ? comments.join('\n') : null;
 }
 
-exports.default = function() {
+module.exports = function() {
   var currentFileName;
   var data;
   var relocatedComments = {};
@@ -82,8 +82,8 @@ exports.default = function() {
       let callee = nodePath.node.callee;
 
       if (functionNames.hasOwnProperty(callee.name)
-          || callee.property &&
-          functionNames.hasOwnProperty(callee.property.name)) {
+            || (callee.property &&
+          functionNames.hasOwnProperty(callee.property.name))) {
         var functionName = functionNames[callee.name]
           || functionNames[callee.property.name];
         var translate = {};
